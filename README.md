@@ -2,11 +2,9 @@ Code for CIKM 2023 Submission: Dually Enhanced Delayed Feedback Modeling for Str
 
 ## Quick Start
 
-1. Please run the shell file "run_pretrain.sh" to get pretrain model.
+1. Please run the shell file ```run_pretrain.sh``` to get pretrain model.
 
-2. Please run the shell file "run_stream.sh" to test our method DDFM in stream training setting.
-
-```METHOD=DDFM LR=1e-4 WC=1e-6 sh run_stream.sh```
+2. Please run the shell file ```run_stream.sh``` to test our method DDFM in stream training setting.
 
 ## Environment
 
