@@ -29,8 +29,8 @@ def delay_tn_dp_loss(targets, outputs, params=None):
     loss = tn_loss + dp_loss
     return {
         "loss": loss,
-        "tn_loss": tn_loss,
-        "dp_loss": dp_loss
+        "tn_loss": tn_loss, # true/real negative loss
+        "dp_loss": dp_loss # delay positive (fake negative) loss
     }
 
 def cross_entropy_loss(targets, outputs, params=None):
