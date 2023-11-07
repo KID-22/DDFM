@@ -19,7 +19,7 @@ torchvision version: 0.8.1+cu110
 ```
 # Reference
 
-Our experiments follow the previous studies: [[ES-DFM](https://github.com/ThyrixYang/es_dfm)], [[DEFER](https://github.com/gusuperstar/defer)], [[DEFUSE](https://github.com/ychen216/DEFUSE)]
+Our experiments follow the previous studies: [[ES-DFM](https://github.com/ThyrixYang/es_dfm)], [[DEFER](https://github.com/gusuperstar/defer)], [[DEFUSE](https://github.com/ychen216/DEFUSE)].
 
 # Citation
 If you find our code or work useful for your research, please cite our work.
