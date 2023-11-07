@@ -72,21 +72,16 @@ def ddfm_loss(targets, outputs, params=None):
     dist_prob = torch.sigmoid(tn_logits.detach())
     dp_prob = torch.sigmoid(dp_logits.detach())
     
-    z1 = 1 - dist_prob
+    z1 = dist_prob
     z2 = 1 - p_no_grad + dp_prob
-    
-    loss1 = stable_log1pex(x) # IP
-    loss2 = stable_log1pex(x) # FN
-    loss3 = x + stable_log1pex(x) # RN
-    loss4 = stable_log1pex(x) # DP
-    loss5 = x + stable_log1pex(x) # Delay_RN
-    loss6 = stable_log1pex(x) # Delay_RN
-    loss1 = loss1
-    loss2 = z1 * loss2
-    loss3 = (1-z1) * loss3
-    loss4 = loss4
-    loss5 = (1-z2) * loss6 + z2 * loss5
-    loss = torch.mean((1-d)*(z*(loss1) + (1-z)*(loss2+loss3)) + d*(z*loss4 + (1-z)*loss5))# + loss5)
+
+    pos_loss = stable_log1pex(x)
+    neg_loss = x + stable_log1pex(x)
+    loss1 = pos_loss # IP
+    loss2 = (1-z1) * pos_loss + z1 * neg_loss # FN + RN
+    loss3 = pos_loss # DP
+    loss4 = (1-z2) * pos_loss + z2 * neg_loss # DN
+    loss = torch.mean((1-d)*(z*(loss1) + (1-z)*(loss2)) + d*(z*loss3 + (1-z)*loss4))
     return {"loss": loss}
 
 def get_loss_fn(name):
