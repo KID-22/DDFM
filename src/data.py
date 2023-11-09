@@ -93,29 +93,6 @@ class DataDF(object):
                       self.labels[idx],
                       self.delay_label[idx])
 
-    def add_esdfm_cut_fake_neg(self, cut_size):
-        mask = self.pay_ts - self.click_ts > cut_size
-        x = np.concatenate(
-            [copy.deepcopy(self.x), copy.deepcopy(self.x[mask])], axis=0)
-        sample_ts = np.concatenate(
-            [self.click_ts+cut_size, self.pay_ts[mask]], axis=0)  # negative samples can only be used after cut_size hours
-        click_ts = np.concatenate(
-            [self.click_ts, self.click_ts[mask]], axis=0)
-        pay_ts = np.concatenate([self.pay_ts, self.pay_ts[mask]], axis=0)
-        labels = copy.deepcopy(self.labels)
-        labels[mask] = 0  # fake negatives
-        # insert delayed positives
-        labels = np.concatenate([labels, np.ones((np.sum(mask),), dtype=int)], axis=0)
-        delay_label = np.concatenate([np.zeros_like(self.click_ts), np.ones_like(self.click_ts[mask])], axis=0)
-        idx = list(range(x.shape[0]))
-        idx = sorted(idx, key=lambda x: sample_ts[x])  # sort by sampling time
-        return DataDF(x[idx],
-                      click_ts[idx],
-                      pay_ts[idx],
-                      sample_ts[idx],
-                      labels[idx],
-                      delay_label[idx])
-
     def to_fsiw_1(self, cd, T):  # build pre-training dataset 1 of FSIW
         mask = np.logical_and(self.click_ts < T-cd, self.pay_ts > 0)
         x = copy.deepcopy(self.x[mask])
@@ -176,16 +153,14 @@ class DataDF(object):
         df2 = copy.deepcopy(self.x) # duplicate data
         x = np.concatenate([df1[inw_mask], df1[~inw_mask], df2[onw_mask], df2[neg_dup_mask]])
         sample_ts = np.concatenate(
-            [self.click_ts[inw_mask], self.click_ts[~inw_mask], 
+            [self.click_ts[inw_mask]+cut_sec, self.click_ts[~inw_mask]+cut_sec, 
             self.pay_ts[onw_mask], self.click_ts[neg_dup_mask] + rn_win], axis=0)
         click_ts = np.concatenate([self.click_ts[inw_mask], self.click_ts[~inw_mask], \
             self.click_ts[onw_mask], self.click_ts[neg_dup_mask]], axis=0)
         pay_ts = np.concatenate([self.pay_ts[inw_mask], self.pay_ts[~inw_mask], \
             self.pay_ts[onw_mask], self.pay_ts[neg_dup_mask]], axis=0)
-        labels = copy.deepcopy(self.labels)
-        # insert delayed positives
         labels = np.concatenate([np.ones((np.sum(inw_mask),)), np.zeros((np.sum(~inw_mask),)), \
-            labels[onw_mask], labels[neg_dup_mask]], axis=0)
+            np.ones((np.sum(onw_mask),)), np.zeros((np.sum(neg_dup_mask),))], axis=0)
         delay_label = np.concatenate([np.zeros((np.sum(inw_mask),)), np.zeros((np.sum(~inw_mask),)), \
             np.ones((np.sum(onw_mask),)), np.ones((np.sum(neg_dup_mask),))], axis=0)
         idx = list(range(x.shape[0]))
